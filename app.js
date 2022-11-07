@@ -2,6 +2,14 @@
 let access_key = 'b9hyxnE9mfvZt0X9pmDGP9rhC0BlMLXzbfO6wvl3N_Q';
 const body = document.querySelector('body');
 
+const closeDropdown = dropdow => {
+    document.addEventListener('click', e => {
+        if(!e.target.closest('.download')){
+            dropdow.classList.add('hide');
+        }
+    });
+}
+
 const downloadImage = img => {
     const download = document.querySelector('.download');
 
@@ -72,9 +80,12 @@ const downloadImage = img => {
         </div>`;
     
     download.innerHTML = downloadHTML;
+    //Dropdown button functionality
     const dropdown = document.querySelector('.dropdown');
     dropdown.addEventListener('click', () => {
         console.log(dropdown.childNodes[3].classList.toggle('hide'));
+        closeDropdown(dropdown.childNodes[3]);
+
     });
 }
 
@@ -116,7 +127,7 @@ const fetchImages = async () => {
 
 const closePopup = popup => {
     document.addEventListener('click', e => {
-        if(e.target.classList.contains('close-btn')){
+        if(e.target.classList.contains('close-btn') || e.target.closest('.header-section')){
             popup.classList.add('hide');
             body.style.overflow = 'auto';   // Enable scroll
         }
