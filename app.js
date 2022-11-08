@@ -1,5 +1,10 @@
 
 let access_key = 'b9hyxnE9mfvZt0X9pmDGP9rhC0BlMLXzbfO6wvl3N_Q';
+
+const random_photo_url = `https://api.unsplash.com/photos/random?client_id=${access_key}&count=30`;
+
+// const search_photo_url = `https://api.unsplash.com/search/photos?client_id=${access_key}&query=${searchParam}&per_page=50`;
+
 const body = document.querySelector('body');
 
 const closeDropdown = dropdow => {
@@ -113,10 +118,7 @@ const displayImages = (images) => {
 //Fetch images from api => Retuens an array of images
 const fetchImages = async () => {
 
-    const random_photo_url = `https://api.unsplash.com/photos/random`;
-    let query  = `?client_id=${access_key}&count=30`;
-
-    const response = await fetch(random_photo_url + query);
+    const response = await fetch(random_photo_url);
     if(response.status !== 200){
         throw new Error(response.statusText);
     }
@@ -158,8 +160,23 @@ const showPopup = () => {
     });
 }
 
-fetchImages()
-    .catch(err => {
-        alert(`Error loading images : ${err}`);
+const callApi = () => {
+    // page++;
+    fetchImages()
+        .catch(err => {
+            alert(`Error loading images : ${err}`);
+        });
+}
+
+const infiniteScroll = () => {
+    window.addEventListener('scroll', () => {
+        // https://www.educative.io/answers/how-to-implement-infinite-scrolling-in-javascript
+        if(window.scrollY + window.innerHeight >= document.documentElement.scrollHeight){
+            callApi();
+        }
     });
+}
+
+callApi();
+infiniteScroll();
 showPopup();
