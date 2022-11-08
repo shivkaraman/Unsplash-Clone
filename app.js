@@ -1,6 +1,19 @@
 
 let access_key = 'b9hyxnE9mfvZt0X9pmDGP9rhC0BlMLXzbfO6wvl3N_Q';
+
+const random_photo_url = `https://api.unsplash.com/photos/random?client_id=${access_key}&count=30`;
+
+// const search_photo_url = `https://api.unsplash.com/search/photos?client_id=${access_key}&query=${searchParam}&per_page=50`;
+
 const body = document.querySelector('body');
+
+const closeDropdown = dropdow => {
+    document.addEventListener('click', e => {
+        if(!e.target.closest('.download')){
+            dropdow.classList.add('hide');
+        }
+    });
+}
 
 const downloadImage = img => {
     const download = document.querySelector('.download');
@@ -72,9 +85,12 @@ const downloadImage = img => {
         </div>`;
     
     download.innerHTML = downloadHTML;
+    //Dropdown button functionality
     const dropdown = document.querySelector('.dropdown');
     dropdown.addEventListener('click', () => {
         console.log(dropdown.childNodes[3].classList.toggle('hide'));
+        closeDropdown(dropdown.childNodes[3]);
+
     });
 }
 
@@ -102,10 +118,7 @@ const displayImages = (images) => {
 //Fetch images from api => Retuens an array of images
 const fetchImages = async () => {
 
-    const random_photo_url = `https://api.unsplash.com/photos/random`;
-    let query  = `?client_id=${access_key}&count=30`;
-
-    const response = await fetch(random_photo_url + query);
+    const response = await fetch(random_photo_url);
     if(response.status !== 200){
         throw new Error(response.statusText);
     }
@@ -116,7 +129,7 @@ const fetchImages = async () => {
 
 const closePopup = popup => {
     document.addEventListener('click', e => {
-        if(e.target.classList.contains('close-btn')){
+        if(e.target.classList.contains('close-btn') || e.target.closest('.header-section')){
             popup.classList.add('hide');
             body.style.overflow = 'auto';   // Enable scroll
         }
@@ -147,8 +160,23 @@ const showPopup = () => {
     });
 }
 
-fetchImages()
-    .catch(err => {
-        alert(`Error loading images : ${err}`);
+const callApi = () => {
+    // page++;
+    fetchImages()
+        .catch(err => {
+            alert(`Error loading images : ${err}`);
+        });
+}
+
+const infiniteScroll = () => {
+    window.addEventListener('scroll', () => {
+        // https://www.educative.io/answers/how-to-implement-infinite-scrolling-in-javascript
+        if(window.scrollY + window.innerHeight >= document.documentElement.scrollHeight){
+            callApi();
+        }
     });
+}
+
+callApi();
+infiniteScroll();
 showPopup();
