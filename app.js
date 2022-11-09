@@ -1,9 +1,10 @@
 
-let access_key = 'b9hyxnE9mfvZt0X9pmDGP9rhC0BlMLXzbfO6wvl3N_Q';
+let access_key = 'ZVjTBhMztzla0oaH_y1TgtZpcDZ-Qh9kwFZwQh4To3s';
 
-const random_photo_url = `https://api.unsplash.com/photos/random?client_id=${access_key}&count=30`;
 
-// const search_photo_url = `https://api.unsplash.com/search/photos?client_id=${access_key}&query=${searchParam}&per_page=50`;
+let searchParam=``, previousSearchParam, search = false, page = 1;
+const random_photo_url = `https://api.unsplash.com/photos/random?client_id=${access_key}&count=15`;
+let search_photo_url = `https://api.unsplash.com/search/photos?client_id=${access_key}&query=${searchParam}&per_page=20`;
 
 const body = document.querySelector('body');
 
@@ -95,7 +96,7 @@ const downloadImage = img => {
 }
 
 const displayImages = (images) => {
-    let gallery = document.querySelector('.gallery');
+    const gallery = document.querySelector('.gallery');
 
     images.forEach(img => {
         gallery.innerHTML += 
@@ -120,11 +121,50 @@ const fetchImages = async () => {
 
     const response = await fetch(random_photo_url);
     if(response.status !== 200){
-        throw new Error(response.statusText);
+        throw new Error(response.status);
     }
     const data = await response.json();
     
     displayImages(data);
+}
+
+const fetchSearchedImages = async() => {
+    search_photo_url = `https://api.unsplash.com/search/photos/?client_id=${access_key}&query=${searchParam}&per_page=30&page=${page}`;
+    console.log(searchParam);
+
+    const response = await fetch(search_photo_url);
+    if(response.status !== 200){
+        throw new Error(response.status);
+    }
+    const data = await response.json();
+    
+    displayImages(data.results);
+}
+
+const loadSearchedImages = searchBox => {
+    const gallery = document.querySelector('.gallery');
+    searchBox.addEventListener('keyup', e => {
+        
+        searchParam = e.target.value.trim();
+        
+        if (previousSearchParam === searchParam) return;
+        else previousSearchParam = searchParam; 
+        
+        gallery.innerHTML = '';
+        fetchSearchedImages();
+    });
+}
+
+const searchImage = async() => {
+    
+    const form = document.querySelector('form');
+    form.addEventListener('submit', e => {
+        e.preventDefault();
+        e.stopPropagation();
+        search = true;
+        
+        loadSearchedImages(e.target[0]);
+    });
 }
 
 const closePopup = popup => {
@@ -161,8 +201,7 @@ const showPopup = () => {
 }
 
 const callApi = () => {
-    // page++;
-    fetchImages()
+    fetchImages(random_photo_url)
         .catch(err => {
             alert(`Error loading images : ${err}`);
         });
@@ -171,8 +210,9 @@ const callApi = () => {
 const infiniteScroll = () => {
     window.addEventListener('scroll', () => {
         // https://www.educative.io/answers/how-to-implement-infinite-scrolling-in-javascript
-        if(window.scrollY + window.innerHeight >= document.documentElement.scrollHeight){
-            callApi();
+        if(window.scrollY + window.innerHeight >= document.documentElement.scrollHeight-30){
+            if(search) fetchSearchedImages();
+            else callApi();
         }
     });
 }
@@ -180,3 +220,4 @@ const infiniteScroll = () => {
 callApi();
 infiniteScroll();
 showPopup();
+searchImage();
