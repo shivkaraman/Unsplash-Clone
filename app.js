@@ -2,6 +2,7 @@
 let access_key = 'LxhJHaSbSkByIspn7kJbPZLaJUspl-Tl6pj--Cikmms';
 
 
+const gallery = document.querySelector('.gallery');
 let searchParam=``, previousSearchParam, search = false, page = 1;
 const random_photo_url = `https://api.unsplash.com/photos/random?client_id=${access_key}&count=30`;
 let search_photo_url = `https://api.unsplash.com/search/photos?client_id=${access_key}&query=${searchParam}&per_page=20`;
@@ -38,7 +39,7 @@ const downloadButtonSetup = img => {
         `<span class="download__btn" onclick="downloadImage('${img.regularImageUrl}', '${img.id}')"> Download </span>
         <div class="dropdown">
             <span class="download__dropdown__arrow">
-                <img src="img/downarrow.svg" alt="down-arrow icon" class="download__dropdown__arrow__img"/>
+                <img src="./img/downarrow.svg" alt="down-arrow icon" class="download__dropdown__arrow__img"/>
             </span>
             <div class="dropdown__content hide">
                 <span onclick="downloadImage('${img.smallImageUrl}', '${img.id}')"> Small </span>
@@ -60,7 +61,6 @@ const downloadButtonSetup = img => {
 }
 
 const homepageDownloadButton = () => {
-    const gallery = document.querySelector('.gallery');
     //Download image button on image
     const downloadButton = document.querySelector('.download__button');
     gallery.addEventListener('click', e => {
@@ -72,7 +72,6 @@ const homepageDownloadButton = () => {
 }
 
 const displayImages = (images) => {
-    const gallery = document.querySelector('.gallery');
 
     images.forEach(img => {
         curr_images[img.id] = {
@@ -114,7 +113,6 @@ const fetchImages = async () => {
 
 const fetchSearchedImages = async() => {
     search_photo_url = `https://api.unsplash.com/search/photos/?client_id=${access_key}&query=${searchParam}&per_page=30&page=${page}`;
-    console.log(searchParam);
 
     const response = await fetch(search_photo_url);
     if(response.status !== 200){
@@ -133,22 +131,35 @@ const fetchSearchedImages = async() => {
     }
     displayImages(data.results);
 }
+
+const callFetchImages = () => {    
+    if (previousSearchParam === searchParam) return;
+    else previousSearchParam = searchParam; 
+    
+    gallery.innerHTML = '';
+    fetchSearchedImages();
+}
       
-const loadSearchedImages = searchBox => {
-    const gallery = document.querySelector('.gallery');
-    searchBox.addEventListener('keypress', e => {
+const loadSearchedImages = () => {
+    const searchBox = document.querySelector('.search-box');
+    searchBox.addEventListener('keyup', e => {
         
         if(e.key ==='Enter'){
             searchParam = e.target.value.trim();
-        
-            if (previousSearchParam === searchParam) return;
-            else previousSearchParam = searchParam; 
-            
-            gallery.innerHTML = '';
-            fetchSearchedImages();
+            callFetchImages(searchParam);
         }
     });
 }
+
+const submitButton = () => {
+    const submit = document.querySelector('.search-btn');
+    const searchBox = document.querySelector('.search-box');
+    submit.addEventListener('click', () => {
+        searchParam = searchBox.value.trim();
+        callFetchImages(searchParam);
+    });
+}
+ 
 
 const searchImage = async() => {
     
@@ -158,7 +169,7 @@ const searchImage = async() => {
         e.stopPropagation();
         search = true;
         
-        loadSearchedImages(e.target[0]);
+        loadSearchedImages();
     });
 }
 
@@ -172,7 +183,6 @@ const closePopup = popup => {
 }
 
 const showPopup = () => {
-    const gallery = document.querySelector('.gallery');
 
     gallery.addEventListener('click', e => {
         if(!e.target.classList.contains('download__button') ){ //If any image (Except download button image) is clicked -> Show popup
@@ -221,3 +231,4 @@ callApi();
 infiniteScroll();
 showPopup();
 searchImage();
+submitButton();
