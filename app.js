@@ -38,7 +38,7 @@ const downloadButtonSetup = img => {
         `<span class="download__btn" onclick="downloadImage('${img.regularImageUrl}', '${img.id}')"> Download </span>
         <div class="dropdown">
             <span class="download__dropdown__arrow">
-                <img src="img/down-arrow.svg" alt="down-arrow icon" class="download__dropdown__arrow__img"/>
+                <img src="img/downarrow.svg" alt="down-arrow icon" class="download__dropdown__arrow__img"/>
             </span>
             <div class="dropdown__content hide">
                 <span onclick="downloadImage('${img.smallImageUrl}', '${img.id}')"> Small </span>
