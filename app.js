@@ -5,7 +5,7 @@ let access_key = 'LxhJHaSbSkByIspn7kJbPZLaJUspl-Tl6pj--Cikmms';
 const gallery = document.querySelector('.gallery');
 let searchParam=``, previousSearchParam, search = false, page = 1;
 const random_photo_url = `https://api.unsplash.com/photos/random?client_id=${access_key}&count=30`;
-let search_photo_url = `https://api.unsplash.com/search/photos?client_id=${access_key}&query=${searchParam}&per_page=20`;
+let search_photo_url = `https://api.unsplash.com/search/photos?client_id=${access_key}&query=${searchParam}&per_page=50`;
 let curr_images = {};
 
 const body = document.querySelector('body');
@@ -29,7 +29,7 @@ const downloadImage = async (imageSrc, id) => {
     console.log(link.download);
     document.body.appendChild(link);
     link.click();
-    // document.body.removeChild(link);
+    document.body.removeChild(link);
 }
 
 const downloadButtonSetup = img => {
@@ -108,7 +108,6 @@ const fetchImages = async () => {
     const data = await response.json();
     
     displayImages(data);
-    console.log(data);
 }
 
 const fetchSearchedImages = async() => {
@@ -137,6 +136,7 @@ const callFetchImages = () => {
     else previousSearchParam = searchParam; 
     
     gallery.innerHTML = '';
+    curr_images = {};
     fetchSearchedImages();
 }
       
@@ -217,18 +217,7 @@ const callApi = () => {
         });
 }
 
-const infiniteScroll = () => {
-    window.addEventListener('scroll', () => {
-        // https://www.educative.io/answers/how-to-implement-infinite-scrolling-in-javascript
-        if(window.scrollY + window.innerHeight >= document.documentElement.scrollHeight-30){
-            if(search) fetchSearchedImages();
-            else callApi();
-        }
-    });
-}
-
 callApi();
-infiniteScroll();
 showPopup();
 searchImage();
 submitButton();
