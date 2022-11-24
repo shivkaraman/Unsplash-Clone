@@ -9,6 +9,8 @@ let search_photo_url = `https://api.unsplash.com/search/photos?client_id=${acces
 let curr_images = {};
 
 const body = document.querySelector('body');
+const loader = document.querySelector('.flexbox');
+const form = document.querySelector('form');
 
 const closeDropdown = dropdow => {
     document.addEventListener('click', e => {
@@ -18,6 +20,7 @@ const closeDropdown = dropdow => {
     });
 }
 
+//Function to downloads the image and saves it on local storage
 const downloadImage = async (imageSrc, id) => {
     const image = await fetch(imageSrc);
     const imageBlog = await image.blob();
@@ -32,6 +35,7 @@ const downloadImage = async (imageSrc, id) => {
     document.body.removeChild(link);
 }
 
+//Download image and dropdown on image popup
 const downloadButtonSetup = img => {
     const download = document.querySelector('.download');
 
@@ -61,16 +65,17 @@ const downloadButtonSetup = img => {
 }
 
 const homepageDownloadButton = () => {
-    //Download image button on image
+    //Download button on image
     const downloadButton = document.querySelector('.download__button');
     gallery.addEventListener('click', e => {
         if(e.target.classList.contains('download__button')){
             const imageId = e.target.getAttribute('data-id');
-            downloadImage(curr_images[imageId].regularImageUrl, imageId);
+            downloadImage(curr_images[imageId].regularImageUrl, imageId); //Downloads the image and saves it on local storage
         }
     });
 }
 
+//Displays random images fetched from api
 const displayImages = (images) => {
 
     images.forEach(img => {
@@ -94,11 +99,12 @@ const displayImages = (images) => {
                 </div>
             </div>
         `;
+        //Enable download button functionality (onw shown on image hover)
         homepageDownloadButton();
     });
 };
 
-//Fetch images from api => Retuens an array of images
+//Fetch images from api => Returns an array of images
 const fetchImages = async () => {
 
     const response = await fetch(random_photo_url);
@@ -108,34 +114,41 @@ const fetchImages = async () => {
     const data = await response.json();
     
     displayImages(data);
+    if(!loader.classList.contains('hide')) loader.classList.add('hide');
 }
 
 const fetchSearchedImages = async() => {
     search_photo_url = `https://api.unsplash.com/search/photos/?client_id=${access_key}&query=${searchParam}&per_page=30&page=${page}`;
+
+    //Show loader
+    loader.classList.remove('hide');
 
     const response = await fetch(search_photo_url);
     if(response.status !== 200){
         throw new Error(response.status);
     }
     const data = await response.json();
+    //If no image is fetched then show popup
     if(data.total === 0){
         const popup = document.querySelector('.search-failed-popup');
         popup.classList.remove('hide');
         setTimeout(() => {
             fetchImages(random_photo_url);
-            search = false;
             popup.classList.add('hide');
-        }, 1000);
+        }, 2000);
         return;
     }
+    
     displayImages(data.results);
+    loader.classList.add('hide');
 }
 
-const callFetchImages = () => {    
+const callFetchSearchedImages = () => {    
     if (previousSearchParam === searchParam) return;
     else previousSearchParam = searchParam; 
     
     gallery.innerHTML = '';
+
     curr_images = {};
     fetchSearchedImages();
 }
@@ -146,7 +159,10 @@ const loadSearchedImages = () => {
         
         if(e.key ==='Enter'){
             searchParam = e.target.value.trim();
-            callFetchImages(searchParam);
+            //Fetch images onlyy if input field is not empty
+            if(searchParam != '')
+                callFetchSearchedImages(searchParam);
+            form.reset();
         }
     });
 }
@@ -156,19 +172,17 @@ const submitButton = () => {
     const searchBox = document.querySelector('.search-box');
     submit.addEventListener('click', () => {
         searchParam = searchBox.value.trim();
-        callFetchImages(searchParam);
+        if(searchParam != '')
+            callFetchSearchedImages(searchParam);
+        form.reset();
     });
 }
  
 
 const searchImage = async() => {
     
-    const form = document.querySelector('form');
     form.addEventListener('submit', e => {
         e.preventDefault();
-        e.stopPropagation();
-        search = true;
-        
         loadSearchedImages();
     });
 }
@@ -211,7 +225,7 @@ const showPopup = () => {
 }
 
 const callApi = () => {
-    fetchImages(random_photo_url)
+    fetchImages()
         .catch(err => {
             alert(`Error loading images : ${err}`);
         });
