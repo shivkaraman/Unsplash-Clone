@@ -1,5 +1,5 @@
 
-let access_key = 'Y2k7BFSfdV1FMbehp2-7fjvNrIo2KXi1nqPWWQiLRHA';
+let access_key = 'X-CyQmqdmSB_YTIzwvgBIaV6GPj1EIyctsGtaYVuX2w';
 
 let searchParam=``, previousSearchParam, search = false, page = 1;
 let curr_images = {}, fetchMore = true;
@@ -59,7 +59,7 @@ const downloadButtonSetup = img => {
         `<span class="download__btn" onclick="downloadImage('${img.regularImageUrl}', '${img.id}')"> Download </span>
         <div class="dropdown">
             <span class="download__dropdown__arrow">
-                <img src="./img/downarrow.svg" alt="down-arrow icon" class="download__dropdown__arrow__img"/>
+                <img src="./img/downArrow.png" alt="down-arrow icon" class="download__dropdown__arrow__img"/>
             </span>
             <div class="dropdown__content hide">
                 <span onclick="downloadImage('${img.smallImageUrl}', '${img.id}')"> Small </span>
