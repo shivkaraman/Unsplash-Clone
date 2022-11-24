@@ -132,6 +132,13 @@ const fetchImages = async () => {
     displayImages(data);
 }
 
+const callApi = () => {
+    fetchImages()
+        .catch(err => {
+            alert(`Error loading images : ${err}`);
+        });
+}
+
 const fetchSearchedImages = async() => {
     page++;
     search_photo_url = `https://api.unsplash.com/search/photos/?client_id=${access_key}&query=${searchParam}&per_page=30&page=${page}`;
@@ -147,7 +154,7 @@ const fetchSearchedImages = async() => {
         search = false;
         popup.classList.remove('hide');
         setTimeout(() => {
-            fetchImages(random_photo_url);
+            callApi();
             popup.classList.add('hide');
         }, 2000);
         return;
@@ -179,7 +186,8 @@ const loadSearchedImages = () => {
         
         if(e.key ==='Enter'){
             searchParam = e.target.value.trim();
-            checkAndFetch(searchParam);
+            if(searchParam !== '')
+                checkAndFetch(searchParam);
         }
     });
 }
@@ -190,7 +198,8 @@ const submitButton = () => {
     submit.addEventListener('click', () => {
         searchParam = searchBox.value.trim();
         search = true;
-        checkAndFetch(searchParam);
+        if(searchParam !== '')
+            checkAndFetch(searchParam);
     });
 }
  
@@ -239,13 +248,6 @@ const showPopup = () => {
             }
         }
     });
-}
-
-const callApi = () => {
-    fetchImages()
-        .catch(err => {
-            alert(`Error loading images : ${err}`);
-        });
 }
 
 const fetchInfiniteImages = () => {
