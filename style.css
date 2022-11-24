@@ -115,10 +115,7 @@
     align-items: center;
     overflow: hidden;
 }
- 
-.flexbox.hide{
-    display: none;
-}
+
 .dbl-spinner {
     position: absolute;
     width: 75px;

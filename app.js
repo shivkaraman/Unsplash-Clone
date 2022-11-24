@@ -1,15 +1,13 @@
 
-let access_key = 'LxhJHaSbSkByIspn7kJbPZLaJUspl-Tl6pj--Cikmms';
+let access_key = 'Y2k7BFSfdV1FMbehp2-7fjvNrIo2KXi1nqPWWQiLRHA';
 
+let searchParam=``, previousSearchParam, search = false, page = 1;
+let curr_images = {}, fetchMore = true;
+
+const random_photo_url = `https://api.unsplash.com/photos/random?client_id=${access_key}&count=30`;
 
 const gallery = document.querySelector('.gallery');
-let searchParam=``, previousSearchParam, search = false, page = 1;
-const random_photo_url = `https://api.unsplash.com/photos/random?client_id=${access_key}&count=30`;
-let search_photo_url = `https://api.unsplash.com/search/photos?client_id=${access_key}&query=${searchParam}&per_page=50`;
-let curr_images = {};
-
 const body = document.querySelector('body');
-const loader = document.querySelector('.flexbox');
 const form = document.querySelector('form');
 
 const fetchBackgroundImage = async () => {
@@ -132,14 +130,11 @@ const fetchImages = async () => {
     const data = await response.json();
     
     displayImages(data);
-    if(!loader.classList.contains('hide')) loader.classList.add('hide');
 }
 
 const fetchSearchedImages = async() => {
+    page++;
     search_photo_url = `https://api.unsplash.com/search/photos/?client_id=${access_key}&query=${searchParam}&per_page=30&page=${page}`;
-
-    //Show loader
-    loader.classList.remove('hide');
 
     const response = await fetch(search_photo_url);
     if(response.status !== 200){
@@ -149,6 +144,7 @@ const fetchSearchedImages = async() => {
     //If no image is fetched then show popup
     if(data.total === 0){
         const popup = document.querySelector('.search-failed-popup');
+        search = false;
         popup.classList.remove('hide');
         setTimeout(() => {
             fetchImages(random_photo_url);
@@ -158,17 +154,23 @@ const fetchSearchedImages = async() => {
     }
     
     displayImages(data.results);
-    loader.classList.add('hide');
 }
 
-const callFetchSearchedImages = () => {    
+const fetchSearched = () => {
+    fetchSearchedImages()
+        .catch(err => {
+            alert(`Error loading images : ${err}`);
+        });
+}
+
+const checkAndFetch = () => {    
     if (previousSearchParam === searchParam) return;
     else previousSearchParam = searchParam; 
     
     gallery.innerHTML = '';
 
     curr_images = {};
-    fetchSearchedImages();
+    fetchSearched();
 }
       
 const loadSearchedImages = () => {
@@ -177,10 +179,7 @@ const loadSearchedImages = () => {
         
         if(e.key ==='Enter'){
             searchParam = e.target.value.trim();
-            //Fetch images onlyy if input field is not empty
-            if(searchParam != '')
-                callFetchSearchedImages(searchParam);
-            form.reset();
+            checkAndFetch(searchParam);
         }
     });
 }
@@ -190,9 +189,8 @@ const submitButton = () => {
     const searchBox = document.querySelector('.search-box');
     submit.addEventListener('click', () => {
         searchParam = searchBox.value.trim();
-        if(searchParam != '')
-            callFetchSearchedImages(searchParam);
-        form.reset();
+        search = true;
+        checkAndFetch(searchParam);
     });
 }
  
@@ -201,6 +199,7 @@ const searchImage = async() => {
     
     form.addEventListener('submit', e => {
         e.preventDefault();
+        search = true;
         loadSearchedImages();
     });
 }
@@ -249,8 +248,29 @@ const callApi = () => {
         });
 }
 
+const fetchInfiniteImages = () => {
+	let options = {
+		root: null,         //Tells which element we want to use as viewport for intersection observer(null => whole webpage(ie curr viewport))
+		rootMargin: '0px',  //Area of viewport on which intersection observer watches for intersection of elements 
+		threshold: 0.1      //represents the distance an element has intersected into or crossed over in the root
+	}
+
+	let observer = new IntersectionObserver((entries) => {
+		if (entries[0].isIntersecting) {
+			console.log('intersecting')
+            search ?  fetchSearched() : callApi();
+		} else {
+			console.log('not Intersecting')
+		}
+	}, options);
+
+    const loader = document.querySelector('.flexbox');
+	observer.observe(loader);
+}
+
 fetchBackgroundImage();
-// callApi();
-// showPopup();
-// searchImage();
-// submitButton();
+callApi();
+fetchInfiniteImages();
+showPopup();
+searchImage();
+submitButton();
