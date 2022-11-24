@@ -12,6 +12,24 @@ const body = document.querySelector('body');
 const loader = document.querySelector('.flexbox');
 const form = document.querySelector('form');
 
+const fetchBackgroundImage = async () => {
+
+	const response = await fetch(`https://api.unsplash.com/photos/random/?client_id=${access_key}&orientation=landscape&query=nature`);
+	const json = await response.json();
+
+	let headerSec = document.querySelector('.header-section');
+	let backgroundImageUrl = ''
+
+	//calulate which image to use as background Image based on window size
+	if (window.innerWidth < 400) backgroundImageUrl = json.urls.small;
+	else if (window.innerWidth < 1080) backgroundImageUrl = json.urls.regular;
+	else backgroundImageUrl = json.urls.full;
+
+	headerSec.style.background = `black url(${backgroundImageUrl}) no-repeat center center`;
+	headerSec.style.backgroundSize = 'cover'
+}
+
+//Closing dropdown in pop-up
 const closeDropdown = dropdow => {
     document.addEventListener('click', e => {
         if(!e.target.closest('.download')){
@@ -231,7 +249,8 @@ const callApi = () => {
         });
 }
 
-callApi();
-showPopup();
-searchImage();
-submitButton();
+fetchBackgroundImage();
+// callApi();
+// showPopup();
+// searchImage();
+// submitButton();
