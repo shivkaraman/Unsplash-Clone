@@ -1,14 +1,33 @@
 
-let access_key = 'LxhJHaSbSkByIspn7kJbPZLaJUspl-Tl6pj--Cikmms';
-
+let access_key = 'Y2k7BFSfdV1FMbehp2-7fjvNrIo2KXi1nqPWWQiLRHA';
 
 let searchParam=``, previousSearchParam, search = false, page = 1;
+let curr_images = {}, fetchMore = true;
+
 const random_photo_url = `https://api.unsplash.com/photos/random?client_id=${access_key}&count=30`;
-let search_photo_url = `https://api.unsplash.com/search/photos?client_id=${access_key}&query=${searchParam}&per_page=20`;
-let curr_images = {};
 
+const gallery = document.querySelector('.gallery');
 const body = document.querySelector('body');
+const form = document.querySelector('form');
 
+const fetchBackgroundImage = async () => {
+
+	const response = await fetch(`https://api.unsplash.com/photos/random/?client_id=${access_key}&orientation=landscape&query=nature`);
+	const json = await response.json();
+
+	let headerSec = document.querySelector('.header-section');
+	let backgroundImageUrl = ''
+
+	//calulate which image to use as background Image based on window size
+	if (window.innerWidth < 400) backgroundImageUrl = json.urls.small;
+	else if (window.innerWidth < 1080) backgroundImageUrl = json.urls.regular;
+	else backgroundImageUrl = json.urls.full;
+
+	headerSec.style.background = `black url(${backgroundImageUrl}) no-repeat center center`;
+	headerSec.style.backgroundSize = 'cover'
+}
+
+//Closing dropdown in pop-up
 const closeDropdown = dropdow => {
     document.addEventListener('click', e => {
         if(!e.target.closest('.download')){
@@ -17,6 +36,7 @@ const closeDropdown = dropdow => {
     });
 }
 
+//Function to downloads the image and saves it on local storage
 const downloadImage = async (imageSrc, id) => {
     const image = await fetch(imageSrc);
     const imageBlog = await image.blob();
@@ -28,9 +48,10 @@ const downloadImage = async (imageSrc, id) => {
     console.log(link.download);
     document.body.appendChild(link);
     link.click();
-    // document.body.removeChild(link);
+    document.body.removeChild(link);
 }
 
+//Download image and dropdown on image popup
 const downloadButtonSetup = img => {
     const download = document.querySelector('.download');
 
@@ -38,7 +59,7 @@ const downloadButtonSetup = img => {
         `<span class="download__btn" onclick="downloadImage('${img.regularImageUrl}', '${img.id}')"> Download </span>
         <div class="dropdown">
             <span class="download__dropdown__arrow">
-                <img src="img/downarrow.svg" alt="down-arrow icon" class="download__dropdown__arrow__img"/>
+                <img src="./img/downarrow.svg" alt="down-arrow icon" class="download__dropdown__arrow__img"/>
             </span>
             <div class="dropdown__content hide">
                 <span onclick="downloadImage('${img.smallImageUrl}', '${img.id}')"> Small </span>
@@ -60,19 +81,18 @@ const downloadButtonSetup = img => {
 }
 
 const homepageDownloadButton = () => {
-    const gallery = document.querySelector('.gallery');
-    //Download image button on image
+    //Download button on image
     const downloadButton = document.querySelector('.download__button');
     gallery.addEventListener('click', e => {
         if(e.target.classList.contains('download__button')){
             const imageId = e.target.getAttribute('data-id');
-            downloadImage(curr_images[imageId].regularImageUrl, imageId);
+            downloadImage(curr_images[imageId].regularImageUrl, imageId); //Downloads the image and saves it on local storage
         }
     });
 }
 
+//Displays random images fetched from api
 const displayImages = (images) => {
-    const gallery = document.querySelector('.gallery');
 
     images.forEach(img => {
         curr_images[img.id] = {
@@ -95,11 +115,12 @@ const displayImages = (images) => {
                 </div>
             </div>
         `;
+        //Enable download button functionality (onw shown on image hover)
         homepageDownloadButton();
     });
 };
 
-//Fetch images from api => Retuens an array of images
+//Fetch images from api => Returns an array of images
 const fetchImages = async () => {
 
     const response = await fetch(random_photo_url);
@@ -109,56 +130,77 @@ const fetchImages = async () => {
     const data = await response.json();
     
     displayImages(data);
-    console.log(data);
 }
 
 const fetchSearchedImages = async() => {
+    page++;
     search_photo_url = `https://api.unsplash.com/search/photos/?client_id=${access_key}&query=${searchParam}&per_page=30&page=${page}`;
-    console.log(searchParam);
 
     const response = await fetch(search_photo_url);
     if(response.status !== 200){
         throw new Error(response.status);
     }
     const data = await response.json();
+    //If no image is fetched then show popup
     if(data.total === 0){
         const popup = document.querySelector('.search-failed-popup');
+        search = false;
         popup.classList.remove('hide');
         setTimeout(() => {
             fetchImages(random_photo_url);
-            search = false;
             popup.classList.add('hide');
-        }, 1000);
+        }, 2000);
         return;
     }
+    
     displayImages(data.results);
 }
+
+const fetchSearched = () => {
+    fetchSearchedImages()
+        .catch(err => {
+            alert(`Error loading images : ${err}`);
+        });
+}
+
+const checkAndFetch = () => {    
+    if (previousSearchParam === searchParam) return;
+    else previousSearchParam = searchParam; 
+    
+    gallery.innerHTML = '';
+
+    curr_images = {};
+    fetchSearched();
+}
       
-const loadSearchedImages = searchBox => {
-    const gallery = document.querySelector('.gallery');
-    searchBox.addEventListener('keypress', e => {
+const loadSearchedImages = () => {
+    const searchBox = document.querySelector('.search-box');
+    searchBox.addEventListener('keyup', e => {
         
         if(e.key ==='Enter'){
             searchParam = e.target.value.trim();
-        
-            if (previousSearchParam === searchParam) return;
-            else previousSearchParam = searchParam; 
-            
-            gallery.innerHTML = '';
-            fetchSearchedImages();
+            checkAndFetch(searchParam);
         }
     });
 }
 
+const submitButton = () => {
+    const submit = document.querySelector('.search-btn');
+    const searchBox = document.querySelector('.search-box');
+    submit.addEventListener('click', () => {
+        searchParam = searchBox.value.trim();
+        search = true;
+        checkAndFetch(searchParam);
+    });
+}
+ 
+
 const searchImage = async() => {
     
-    const form = document.querySelector('form');
     form.addEventListener('submit', e => {
         e.preventDefault();
-        e.stopPropagation();
         search = true;
-        
-        loadSearchedImages(e.target[0]);
+        loadSearchedImages();
     });
 }
 
@@ -172,7 +214,6 @@ const closePopup = popup => {
 }
 
 const showPopup = () => {
-    const gallery = document.querySelector('.gallery');
 
     gallery.addEventListener('click', e => {
         if(!e.target.classList.contains('download__button') ){ //If any image (Except download button image) is clicked -> Show popup
@@ -201,23 +242,35 @@ const showPopup = () => {
 }
 
 const callApi = () => {
-    fetchImages(random_photo_url)
+    fetchImages()
         .catch(err => {
             alert(`Error loading images : ${err}`);
         });
 }
 
-const infiniteScroll = () => {
-    window.addEventListener('scroll', () => {
-        // https://www.educative.io/answers/how-to-implement-infinite-scrolling-in-javascript
-        if(window.scrollY + window.innerHeight >= document.documentElement.scrollHeight-30){
-            if(search) fetchSearchedImages();
-            else callApi();
-        }
-    });
+const fetchInfiniteImages = () => {
+	let options = {
+		root: null,         //Tells which element we want to use as viewport for intersection observer(null => whole webpage(ie curr viewport))
+		rootMargin: '0px',  //Area of viewport on which intersection observer watches for intersection of elements 
+		threshold: 0.1      //represents the distance an element has intersected into or crossed over in the root
+	}
+
+	let observer = new IntersectionObserver((entries) => {
+		if (entries[0].isIntersecting) {
+			console.log('intersecting')
+            search ?  fetchSearched() : callApi();
+		} else {
+			console.log('not Intersecting')
+		}
+	}, options);
+
+    const loader = document.querySelector('.flexbox');
+	observer.observe(loader);
 }
 
+fetchBackgroundImage();
 callApi();
-infiniteScroll();
+fetchInfiniteImages();
 showPopup();
 searchImage();
+submitButton();
