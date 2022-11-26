@@ -37,18 +37,24 @@ const closeDropdown = dropdow => {
 }
 
 //Function to downloads the image and saves it on local storage
-const downloadImage = async (imageSrc, id) => {
-    const image = await fetch(imageSrc);
-    const imageBlog = await image.blob();
-    const imageURL = URL.createObjectURL(imageBlog);
-  
-    const link = document.createElement('a');
-    link.href = imageURL;
-    link.download = id;
-    console.log(link.download);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+const downloadImage = async (imageId, width, height) => {
+    img = curr_images[imageId];
+
+	//fetch the image url
+	const response = await fetch(`${curr_images[imageId]['downloadLink']}&client_id=${access_key}`);
+	const res = await response.json()
+
+	//compute the final url
+	//check importance of dl parameter https://docs.imgix.com/apis/rendering/format/dl
+	const imageSrc = `${res.url}&w=${width}&h=${height}&dl=unsplash-image-${imageId}.jpg`;
+
+	//download the url
+	const link = document.createElement('a');
+	link.href = imageSrc;
+	link.click();
+
+	//remove the link element
+	link.remove();
 }
 
 //Download image and dropdown on image popup
@@ -68,11 +74,11 @@ const downloadButtonSetup = img => {
                 <img src="./img/downArrow.png" alt="down-arrow icon" class="download__dropdown__arrow__img"/>
             </span>
             <div class="dropdown__content hide">
-                <span onclick="downloadImage('${img.smallImageUrl}', '${img.id}')"> Small (${smallWidth}x${smallHeight})</span>
-                <span onclick="downloadImage('${img.regularImageUrl}', '${img.id}')"> Medium (${mediumWidth}x${mediumHeight})</span>
-                <span onclick="downloadImage('${img.fullImageUrl}', '${img.id}')"> Large (${largeWidth}x${largeHeight})</span>
+                <span onclick="downloadImage('${img.id}', '${smallWidth}', '${smallHeight})'"> Small (${smallWidth}x${smallHeight})</span>
+                <span onclick="downloadImage('${img.id}', '${mediumWidth}', '${mediumHeight})')"> Medium (${mediumWidth}x${mediumHeight})</span>
+                <span onclick="downloadImage('${img.id}', '${largeWidth}', '${largeHeight})')"> Large (${largeWidth}x${largeHeight})</span>
                 <hr />
-                <span onclick="downloadImage('${img.rawImageUrl}', '${img.id}')"> Original Size </span>
+                <span onclick="downloadImage('${img.id}', '${img.width}', '${img.height})')"> Original Size (${img.width}x${img.height})</span>
             </div>
         </div>`;
     
@@ -91,7 +97,7 @@ const homepageDownloadButton = () => {
     gallery.addEventListener('click', e => {
         if(e.target.classList.contains('download__button')){
             const imageId = e.target.getAttribute('data-id');
-            downloadImage(curr_images[imageId].regularImageUrl, imageId); //Downloads the image and saves it on local storage
+            downloadImage(imageId, curr_images[imageId].width, curr_images[imageId].height); //Downloads the image and saves it on local storage
         }
     });
 }
@@ -108,7 +114,8 @@ const displayImages = (images) => {
 			fullImageUrl: img.urls.full,
             rawImageUrl: img.urls.raw,
             height: img.height,
-			width: img.width
+			width: img.width,
+            downloadLink: img.links.download_location
         };
         newImages += 
         `
