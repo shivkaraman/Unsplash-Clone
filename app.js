@@ -132,6 +132,7 @@ const displayImages = (images) => {
         `;
     });
     gallery.innerHTML += newImages;
+    fetchMore = true;
     //Enable download button functionality (onw shown on image hover)
     homepageDownloadButton();
 };
@@ -145,8 +146,8 @@ const fetchImages = async () => {
     }
     const data = await response.json();
     
+    console.log(data);
     displayImages(data);
-    fetchMore = true;
 }
 
 const callApi = () => {
@@ -176,8 +177,9 @@ const fetchSearchedImages = async() => {
         }, 2000);
         return;
     }
+
+    console.log(data.results);
     displayImages(data.results);
-    fetchMore = true;
 }
 
 const fetchSearched = () => {
@@ -194,6 +196,8 @@ const checkAndFetch = () => {
     gallery.innerHTML = '';
 
     curr_images = {};
+    
+    fetchMore = false;
     fetchSearched();
 }
       
