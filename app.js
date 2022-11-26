@@ -1,5 +1,5 @@
 
-let access_key = 'B7a0RKxHCtr3oMzssTzSWNbbK8iFDIp583hYx1lLWTo';
+let access_key = 'fw0e7WefhGk9xbx_Hb7INj-1JC53yAQDIuv0YHcyxc0';
 
 let searchParam=``, previousSearchParam, search = false, page = 1;
 let curr_images = {}, fetchMore = false;
@@ -68,13 +68,13 @@ const downloadButtonSetup = img => {
 	const largeHeight = Math.floor((img.height / img.width) * largeWidth);
 
     const downloadHTML = 
-        `<span class="download__btn" onclick="downloadImage('${img.regularImageUrl}', '${img.id}')"> Download </span>
+        `<span class="download__btn" onclick="downloadImage('${img.id}', '${img.width}', '${img.height})')"> Download </span>
         <div class="dropdown">
             <span class="download__dropdown__arrow">
                 <img src="./img/downArrow.png" alt="down-arrow icon" class="download__dropdown__arrow__img"/>
             </span>
             <div class="dropdown__content hide">
-                <span onclick="downloadImage('${img.id}', '${smallWidth}', '${smallHeight})'"> Small (${smallWidth}x${smallHeight})</span>
+                <span onclick="downloadImage('${img.id}', '${smallWidth}', '${smallHeight})')"> Small (${smallWidth}x${smallHeight})</span>
                 <span onclick="downloadImage('${img.id}', '${mediumWidth}', '${mediumHeight})')"> Medium (${mediumWidth}x${mediumHeight})</span>
                 <span onclick="downloadImage('${img.id}', '${largeWidth}', '${largeHeight})')"> Large (${largeWidth}x${largeHeight})</span>
                 <hr />
@@ -146,7 +146,6 @@ const fetchImages = async () => {
     }
     const data = await response.json();
     
-    console.log(data);
     displayImages(data);
 }
 
@@ -178,7 +177,6 @@ const fetchSearchedImages = async() => {
         return;
     }
 
-    console.log(data.results);
     displayImages(data.results);
 }
 
@@ -258,7 +256,6 @@ const showPopup = () => {
             const imageId = e.target.getAttribute('data-id');
 
             image.setAttribute('src', imageSource);
-            console.log(curr_images);
             downloadButtonSetup(curr_images[imageId]);
 
             if (!popup.classList.contains('hide')) {
