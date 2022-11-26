@@ -1,10 +1,10 @@
 
-let access_key = 'X-CyQmqdmSB_YTIzwvgBIaV6GPj1EIyctsGtaYVuX2w';
+let access_key = 'jHxIT7hMxjicfPup9xwdto9gude_qxwQRvNPKpH7vGc';
 
 let searchParam=``, previousSearchParam, search = false, page = 1;
-let curr_images = {}, fetchMore = true;
+let curr_images = {}, fetchMore = false;
 
-const random_photo_url = `https://api.unsplash.com/photos/random?client_id=${access_key}&count=30`;
+const random_photo_url = `https://api.unsplash.com/photos/random?client_id=${access_key}&count=20`;
 
 const gallery = document.querySelector('.gallery');
 const body = document.querySelector('body');
@@ -54,6 +54,12 @@ const downloadImage = async (imageSrc, id) => {
 //Download image and dropdown on image popup
 const downloadButtonSetup = img => {
     const download = document.querySelector('.download');
+    const smallWidth = 640;
+	const smallHeight = Math.floor((img.height / img.width) * smallWidth);
+	const mediumWidth = 1920;
+	const mediumHeight = Math.floor((img.height / img.width) * mediumWidth);
+	const largeWidth = 2400;
+	const largeHeight = Math.floor((img.height / img.width) * largeWidth);
 
     const downloadHTML = 
         `<span class="download__btn" onclick="downloadImage('${img.regularImageUrl}', '${img.id}')"> Download </span>
@@ -62,9 +68,9 @@ const downloadButtonSetup = img => {
                 <img src="./img/downArrow.png" alt="down-arrow icon" class="download__dropdown__arrow__img"/>
             </span>
             <div class="dropdown__content hide">
-                <span onclick="downloadImage('${img.smallImageUrl}', '${img.id}')"> Small </span>
-                <span onclick="downloadImage('${img.regularImageUrl}', '${img.id}')"> Medium </span>
-                <span onclick="downloadImage('${img.fullImageUrl}', '${img.id}')"> Large </span>
+                <span onclick="downloadImage('${img.smallImageUrl}', '${img.id}')"> Small (${smallWidth}x${smallHeight})</span>
+                <span onclick="downloadImage('${img.regularImageUrl}', '${img.id}')"> Medium (${mediumWidth}x${mediumHeight})</span>
+                <span onclick="downloadImage('${img.fullImageUrl}', '${img.id}')"> Large (${largeWidth}x${largeHeight})</span>
                 <hr />
                 <span onclick="downloadImage('${img.rawImageUrl}', '${img.id}')"> Original Size </span>
             </div>
@@ -82,7 +88,6 @@ const downloadButtonSetup = img => {
 
 const homepageDownloadButton = () => {
     //Download button on image
-    const downloadButton = document.querySelector('.download__button');
     gallery.addEventListener('click', e => {
         if(e.target.classList.contains('download__button')){
             const imageId = e.target.getAttribute('data-id');
@@ -93,6 +98,7 @@ const homepageDownloadButton = () => {
 
 //Displays random images fetched from api
 const displayImages = (images) => {
+    let newImages = '';
 
     images.forEach(img => {
         curr_images[img.id] = {
@@ -100,12 +106,14 @@ const displayImages = (images) => {
             smallImageUrl: img.urls.small,
 			regularImageUrl: img.urls.regular,
 			fullImageUrl: img.urls.full,
-            rawImageUrl: img.urls.raw
+            rawImageUrl: img.urls.raw,
+            height: img.height,
+			width: img.width
         };
-        gallery.innerHTML += 
+        newImages += 
         `
             <div class="gallery-img">
-                <img src="${img.urls.small}" data-id="${img.id}" class="gallery__image" alt="">
+                <img src="${img.urls.small}" data-id="${img.id}" class="gallery__image" alt="" loading="lazy">
                 <div class="user">
                     <div class="user__container">
                         <img src="${img.user.profile_image.large}" class="user__img" alt="">
@@ -115,9 +123,10 @@ const displayImages = (images) => {
                 </div>
             </div>
         `;
-        //Enable download button functionality (onw shown on image hover)
-        homepageDownloadButton();
     });
+    gallery.innerHTML += newImages;
+    //Enable download button functionality (onw shown on image hover)
+    homepageDownloadButton();
 };
 
 //Fetch images from api => Returns an array of images
@@ -130,6 +139,7 @@ const fetchImages = async () => {
     const data = await response.json();
     
     displayImages(data);
+    fetchMore = true;
 }
 
 const callApi = () => {
@@ -141,7 +151,7 @@ const callApi = () => {
 
 const fetchSearchedImages = async() => {
     page++;
-    search_photo_url = `https://api.unsplash.com/search/photos/?client_id=${access_key}&query=${searchParam}&per_page=30&page=${page}`;
+    search_photo_url = `https://api.unsplash.com/search/photos/?client_id=${access_key}&query=${searchParam}&per_page=20&page=${page}`;
 
     const response = await fetch(search_photo_url);
     if(response.status !== 200){
@@ -159,8 +169,8 @@ const fetchSearchedImages = async() => {
         }, 2000);
         return;
     }
-    
     displayImages(data.results);
+    fetchMore = true;
 }
 
 const fetchSearched = () => {
@@ -260,7 +270,8 @@ const fetchInfiniteImages = () => {
 	let observer = new IntersectionObserver((entries) => {
 		if (entries[0].isIntersecting) {
 			console.log('intersecting')
-            search ?  fetchSearched() : callApi();
+            fetchMore && (search ?  fetchSearched() : callApi());
+            fetchMore = false;
 		} else {
 			console.log('not Intersecting')
 		}
