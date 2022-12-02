@@ -1,10 +1,12 @@
 
-let access_key = 'cdmxIhg05mRY575-Gf_0DxqRpogA4DVLOGpBZ6odWBs';
+// let access_key = 'cdmxIhg05mRY575-Gf_0DxqRpogA4DVLOGpBZ6odWBs';
+// let access_key = 'wmz9BQV2KIgPKauAHJJ8VfQsnYO57Xv16IIYZ1yn3uw';
+let access_key = 'FumcOmUrmbT5o157rAJyyXDdgM3ZMzWIgwSJd6nG6dM';
 
-let searchParam=``, previousSearchParam, search = false, page = 1;
+let searchParam=``, previousSearchParam, search = false, page = 1, zoomed = false;
 let curr_images = {}, fetchMore = false;
 
-const random_photo_url = `https://api.unsplash.com/photos/random?client_id=${access_key}&count=20`;
+const random_photo_url = `https://api.unsplash.com/photos/random?client_id=${access_key}&count=5`;
 
 const gallery = document.querySelector('.gallery');
 const body = document.querySelector('body');
@@ -57,6 +59,8 @@ const downloadImage = async (imageId, width, height) => {
 	link.remove();
 }
 
+
+
 //Download image and dropdown on image popup
 const downloadButtonSetup = img => {
     const download = document.querySelector('.download');
@@ -96,6 +100,7 @@ const homepageDownloadButton = () => {
     //Download button on image
     gallery.addEventListener('click', e => {
         if(e.target.classList.contains('download__button')){
+            e.stopPropagation();
             const imageId = e.target.getAttribute('data-id');
             downloadImage(imageId, curr_images[imageId].width, curr_images[imageId].height); //Downloads the image and saves it on local storage
         }
@@ -120,7 +125,7 @@ const displayImages = (images) => {
         newImages += 
         `
             <div class="gallery-img">
-                <img src="${img.urls.small}" data-id="${img.id}" class="gallery__image" alt="" loading="lazy">
+                <img src="${img.urls.full}" data-id="${img.id}" class="gallery__image" alt="" loading="lazy">
                 <div class="user">
                     <div class="user__container">
                         <img src="${img.user.profile_image.large}" class="user__img" alt="">
@@ -232,9 +237,38 @@ const searchImage = async() => {
     });
 }
 
+ const zoomImgFunc = image => {
+    if(zoomed == false){
+        console.log('zooming img');
+        zoomed = true;
+        image.classList.remove('not-zoomed');
+        image.classList.add('zoomed');
+    }
+    else{
+        console.log('unzooming');
+        zoomed = false;
+        image.classList.remove('zoomed');
+        image.classList.add('not-zoomed');
+    }
+ }
+
+const zoomImage = (image) => {
+    image.addEventListener('click', e => {
+        e.stopPropagation();
+        zoomImgFunc(image);
+    });
+}
+
 const closePopup = popup => {
     document.addEventListener('click', e => {
         if(e.target.classList.contains('close-btn') || e.target.closest('.header-section')){
+            e.stopPropagation();
+
+            image = popup.querySelector('.large-img');
+            zoomed = false;
+            image.removeEventListener('click', zoomImage);
+            
+            //Close popup and enable scroll
             popup.classList.add('hide');
             body.style.overflow = 'auto';   // Enable scroll
         }
@@ -244,20 +278,25 @@ const closePopup = popup => {
 const showPopup = () => {
 
     gallery.addEventListener('click', e => {
-        if(!e.target.classList.contains('download__button') ){ //If any image (Except download button image) is clicked -> Show popup
+        //If any image (Except download button image) is clicked -> Show popup
+        if(!e.target.classList.contains('download__button') ){
+            e.stopPropagation();
+            console.log('image clicked');
             const popup = document.querySelector('.image-popup');
             popup.classList.toggle('hide');
 
             if (!popup.classList.contains('hide')) {
                 body.style.overflow = "hidden"; // Disable scroll
             }
-            const image = popup.childNodes[5];
+            
+            const image = popup.querySelector('.large-img');
             const imageSource = e.target.getAttribute('src');
             const imageId = e.target.getAttribute('data-id');
 
             image.setAttribute('src', imageSource);
             downloadButtonSetup(curr_images[imageId]);
-
+            zoomImage(image);
+        
             if (!popup.classList.contains('hide')) {
                 closePopup(popup);
             }

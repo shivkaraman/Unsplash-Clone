@@ -233,7 +233,6 @@
 
 
 /* image popup */
-
 .image-popup{
     position: fixed;
     z-index: 1;
@@ -361,13 +360,55 @@
     top: 0rem;
 }
 
-.large-img{
+
+.image{
+    height: 80%;
+    width: 100%;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow-y: auto;
+}
+
+/* .fa-up-right-and-down-left-from-center{
+    position: absolute;
+    font-size: 1.75rem;
+    color: white;
+    display: inline-block;
+    top: 1.25rem;
+    right: 1.25rem;
+    transition: opacity 250ms ease-in;
+} */
+
+.large-img.not-zoomed{
     max-height: 80%;
-    width: auto;
-    max-width: 80%;
+    max-width: 90%;
     object-fit: cover;
     border-radius: 10px;
 }
+
+.large-img.zoomed{
+    position: absolute;
+    top: 0;
+    height: auto;
+    width: 100%;
+    overflow-y: auto;
+    border-radius: 0px;
+}
+
+
+.large-img:hover{
+    cursor: zoom-in;
+}
+
+.large-img.zoomed:hover{
+    cursor: zoom-out;
+}
+/*
+.large-img:hover  .fa-up-right-and-down-left-from-center{
+    cursor: pointer;
+} */
 
 .controls{
     background: none;
