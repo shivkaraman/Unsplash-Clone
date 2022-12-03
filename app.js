@@ -4,7 +4,7 @@ let access_key = 'cdmxIhg05mRY575-Gf_0DxqRpogA4DVLOGpBZ6odWBs';
 let searchParam=``, previousSearchParam, search = false, page = 1, zoomed = false;
 let curr_images = {}, fetchMore = false;
 
-const random_photo_url = `https://api.unsplash.com/photos/random?client_id=${access_key}&count=5`;
+const random_photo_url = `https://api.unsplash.com/photos/random?client_id=${access_key}&count=20`;
 
 const gallery = document.querySelector('.gallery');
 const body = document.querySelector('body');
