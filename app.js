@@ -1,7 +1,5 @@
 
-// let access_key = 'cdmxIhg05mRY575-Gf_0DxqRpogA4DVLOGpBZ6odWBs';
-// let access_key = 'wmz9BQV2KIgPKauAHJJ8VfQsnYO57Xv16IIYZ1yn3uw';
-let access_key = 'FumcOmUrmbT5o157rAJyyXDdgM3ZMzWIgwSJd6nG6dM';
+let access_key = 'cdmxIhg05mRY575-Gf_0DxqRpogA4DVLOGpBZ6odWBs';
 
 let searchParam=``, previousSearchParam, search = false, page = 1, zoomed = false;
 let curr_images = {}, fetchMore = false;
