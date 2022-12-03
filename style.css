@@ -1,4 +1,4 @@
-*{
+*, *::before, *::after{
     margin: 0;
     padding: 0;
     box-sizing: border-box;
@@ -370,18 +370,25 @@
     overflow-y: auto;
 }
 
-/* .fa-up-right-and-down-left-from-center{
-    position: absolute;
-    font-size: 1.75rem;
+.image > span.not-zoomed{
+    align-self: flex-start;
+    position: relative;
+    top: 1rem;
+    left: -3rem;
+}
+
+.image > span.not-zoomed::before{
+    content: '\f424';
+    font: var(--fa-font-solid);
+    font-weight: 900;
+    font-size: 2rem;
     color: white;
-    display: inline-block;
-    top: 1.25rem;
-    right: 1.25rem;
-    transition: opacity 250ms ease-in;
-} */
+    cursor: pointer;
+    /* opacity: 0.7; */
+}
 
 .large-img.not-zoomed{
-    max-height: 80%;
+    height: 100%;
     max-width: 90%;
     object-fit: cover;
     border-radius: 10px;

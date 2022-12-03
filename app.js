@@ -237,15 +237,14 @@ const searchImage = async() => {
 }
 
  const zoomImgFunc = image => {
-    
+    const zoomIcon = image.parentElement.querySelector('span');
+    zoomIcon.classList.toggle('not-zoomed');
     if(zoomed == false){
-        console.log('zooming img');
         zoomed = true;
         image.classList.remove('not-zoomed');
         image.classList.add('zoomed');
     }
     else{
-        console.log('unzooming');
         zoomed = false;
         image.classList.remove('zoomed');
         image.classList.add('not-zoomed');
@@ -253,13 +252,15 @@ const searchImage = async() => {
  }
 
  const helperFunc = e => {
-    e.stopPropagation();
-    image = e.target;
-    zoomImgFunc(image);
+    if(e.target.classList.contains('large-img') || e.target.classList.contains('not-zoomed')){
+        e.stopPropagation();
+        image = e.target.parentElement.querySelector('.large-img');
+        zoomImgFunc(image);
+    }
  }
 
-const zoomImage = (image) => {
-    image.addEventListener('click', helperFunc, false);
+const zoomImage = (imgContainer) => {
+    imgContainer.addEventListener('click', helperFunc, false);
 }
 
 const closePopup = popup => {
@@ -268,10 +269,10 @@ const closePopup = popup => {
             e.stopPropagation();
 
             //Default zoom to NOT-ZOOMED and remove event listener
-            image = popup.querySelector('.large-img');
+            const imgContainer = popup.querySelector('.large-img').parentElement;
             zoomed = true;
-            zoomImgFunc(image);
-            image.removeEventListener('click', helperFunc, false);
+            zoomImgFunc(imgContainer);
+            imgContainer.removeEventListener('click', helperFunc, false);
             
             //Close popup and enable scroll
             popup.classList.add('hide');
@@ -300,7 +301,7 @@ const showPopup = () => {
 
             image.setAttribute('src', imageSource);
             downloadButtonSetup(curr_images[imageId]);
-            zoomImage(image);
+            zoomImage(image.parentElement);
         
             if (!popup.classList.contains('hide')) {
                 closePopup(popup);
