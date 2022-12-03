@@ -236,16 +236,17 @@ const searchImage = async() => {
 
  const zoomImgFunc = image => {
     const zoomIcon = image.parentElement.querySelector('span');
-    zoomIcon.classList.toggle('not-zoomed');
     if(zoomed == false){
         zoomed = true;
         image.classList.remove('not-zoomed');
         image.classList.add('zoomed');
+        zoomIcon.classList.remove('not-zoomed');
     }
     else{
         zoomed = false;
         image.classList.remove('zoomed');
         image.classList.add('not-zoomed');
+        zoomIcon.classList.add('not-zoomed');
     }
  }
 
