@@ -4,7 +4,7 @@ let access_key = 'cdmxIhg05mRY575-Gf_0DxqRpogA4DVLOGpBZ6odWBs';
 let searchParam=``, previousSearchParam, search = false, page = 1, zoomed = false;
 let curr_images = {}, fetchMore = false;
 
-const random_photo_url = `https://api.unsplash.com/photos/random?client_id=${access_key}&count=5`;
+const random_photo_url = `https://api.unsplash.com/photos/random?client_id=${access_key}&count=20`;
 
 const gallery = document.querySelector('.gallery');
 const body = document.querySelector('body');
@@ -236,16 +236,19 @@ const searchImage = async() => {
 
  const zoomImgFunc = image => {
     const zoomIcon = image.parentElement.querySelector('span');
-    zoomIcon.classList.toggle('not-zoomed');
     if(zoomed == false){
         zoomed = true;
         image.classList.remove('not-zoomed');
         image.classList.add('zoomed');
+        zoomIcon.classList.remove('not-zoomed');
+        console.log('logo removed');
     }
     else{
         zoomed = false;
         image.classList.remove('zoomed');
         image.classList.add('not-zoomed');
+        zoomIcon.classList.add('not-zoomed');
+        console.log('logo added');
     }
  }
 
@@ -269,7 +272,7 @@ const closePopup = popup => {
             //Default zoom to NOT-ZOOMED and remove event listener
             const imgContainer = popup.querySelector('.large-img').parentElement;
             zoomed = true;
-            zoomImgFunc(imgContainer);
+            zoomImgFunc(popup.querySelector('.large-img'));
             imgContainer.removeEventListener('click', helperFunc, false);
             
             //Close popup and enable scroll
