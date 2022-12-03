@@ -60,7 +60,6 @@ const downloadImage = async (imageId, width, height) => {
 }
 
 
-
 //Download image and dropdown on image popup
 const downloadButtonSetup = img => {
     const download = document.querySelector('.download');
@@ -238,6 +237,7 @@ const searchImage = async() => {
 }
 
  const zoomImgFunc = image => {
+    
     if(zoomed == false){
         console.log('zooming img');
         zoomed = true;
@@ -252,11 +252,14 @@ const searchImage = async() => {
     }
  }
 
+ const helperFunc = e => {
+    e.stopPropagation();
+    image = e.target;
+    zoomImgFunc(image);
+ }
+
 const zoomImage = (image) => {
-    image.addEventListener('click', e => {
-        e.stopPropagation();
-        zoomImgFunc(image);
-    });
+    image.addEventListener('click', helperFunc, false);
 }
 
 const closePopup = popup => {
@@ -264,9 +267,11 @@ const closePopup = popup => {
         if(e.target.classList.contains('close-btn') || e.target.closest('.header-section')){
             e.stopPropagation();
 
+            //Default zoom to NOT-ZOOMED and remove event listener
             image = popup.querySelector('.large-img');
-            zoomed = false;
-            image.removeEventListener('click', zoomImage);
+            zoomed = true;
+            zoomImgFunc(image);
+            image.removeEventListener('click', helperFunc, false);
             
             //Close popup and enable scroll
             popup.classList.add('hide');
