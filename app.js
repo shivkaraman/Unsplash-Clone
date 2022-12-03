@@ -241,12 +241,14 @@ const searchImage = async() => {
         image.classList.remove('not-zoomed');
         image.classList.add('zoomed');
         zoomIcon.classList.remove('not-zoomed');
+        console.log('logo removed');
     }
     else{
         zoomed = false;
         image.classList.remove('zoomed');
         image.classList.add('not-zoomed');
         zoomIcon.classList.add('not-zoomed');
+        console.log('logo added');
     }
  }
 
@@ -270,7 +272,7 @@ const closePopup = popup => {
             //Default zoom to NOT-ZOOMED and remove event listener
             const imgContainer = popup.querySelector('.large-img').parentElement;
             zoomed = true;
-            zoomImgFunc(imgContainer);
+            zoomImgFunc(popup.querySelector('.large-img'));
             imgContainer.removeEventListener('click', helperFunc, false);
             
             //Close popup and enable scroll
