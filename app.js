@@ -236,10 +236,12 @@ const searchImage = async() => {
 
  const zoomImgFunc = image => {
     const zoomIcon = image.parentElement.querySelector('span');
+    const popup = image.parentElement.parentElement;
     if(zoomed == false){
         zoomed = true;
         image.classList.remove('not-zoomed');
         image.classList.add('zoomed');
+        popup.classList.add('zoomed');
         zoomIcon.classList.remove('not-zoomed');
         console.log('logo removed');
     }
@@ -247,6 +249,7 @@ const searchImage = async() => {
         zoomed = false;
         image.classList.remove('zoomed');
         image.classList.add('not-zoomed');
+        popup.classList.remove('zoomed');
         zoomIcon.classList.add('not-zoomed');
         console.log('logo added');
     }

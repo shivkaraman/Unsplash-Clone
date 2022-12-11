@@ -261,6 +261,10 @@
     align-items: center;
 }
 
+.image-popup.zoomed{
+    align-items: flex-end;
+}
+
 .image-popup.hide{
     display: none;
     opacity: 0;
@@ -380,6 +384,10 @@
     overflow-y: auto;
 }
 
+.image-popup.zoomed > .image{
+    height: 90%;
+}
+
 .image > span.not-zoomed{
     align-self: flex-start;
     position: relative;
@@ -409,9 +417,9 @@
     height: auto;
     width: 100%;
     overflow-y: auto;
-    border-radius: 0px;
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
 }
-
 
 .large-img:hover{
     cursor: zoom-in;
